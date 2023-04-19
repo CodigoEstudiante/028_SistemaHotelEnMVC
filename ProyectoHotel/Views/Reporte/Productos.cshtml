@@ -1,0 +1,50 @@
+﻿
+@{
+    ViewBag.Title = "Productos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card shadow-sm mt-2">
+    <div class="card-body p-3">
+        <h6 class="card-title font-weight-bold text-primary">Exportar Productos</h6>
+        <hr class="mt-1 mb-1" />
+        @using (Html.BeginForm("ExportarProductos", "Reporte", FormMethod.Post))
+        {
+            <div class="form-row align-items-end">
+                <div class="col-md-3">
+                    <label class="form-text font-weight-bold">Estado:</label>
+                    <select id="cboestado" name="estado" class="form-control">
+                        <option value="2">Todos</option>
+                        <option value="1">Activo</option>
+                        <option value="0">No Activo</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-text font-weight-bold">Fecha Inicio:</label>
+                    <input name="fechainicio" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-text font-weight-bold">Fecha Fin:</label>
+                    <input name="fechafin" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-block btn-success"><i class="fas fa-cloud-download-alt"></i> Descargar</button>
+                </div>
+            </div>
+        }
+            
+    </div>
+</div>
+
+
+@section scripts{
+    <script>
+
+        $(document).ready(function () {
+
+            $("input[name=fechainicio]").datepicker().datepicker('setDate', new Date());
+            $("input[name=fechafin]").datepicker().datepicker('setDate', new Date());
+        })
+       
+    </script>
+}

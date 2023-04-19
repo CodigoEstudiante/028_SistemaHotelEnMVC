@@ -1,0 +1,130 @@
+﻿
+@{
+    ViewBag.Title = "Vender";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="card">
+    <div class="card-body">
+        <div class="form-group row">
+            <label for="inputPassword" class="col-sm-2 col-form-label">Seleccionar Piso</label>
+            <div class="col-sm-4">
+                <select class="form-control" id="cbopiso"></select>
+            </div>
+        </div>
+        <hr />
+        <div id="habitaciones" class="row">
+
+
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+
+    <script>
+        var tabladata;
+
+        $(document).ready(function () {
+
+            jQuery.ajax({
+                url: '@Url.Action("ListarPiso", "Mantenimiento")',
+                type: "GET",
+                data: null,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("<option>").attr({ "value": "0"}).text("Todos").appendTo("#cbopiso");
+
+                    $.each(data.data, function (index, value) {
+                        $("<option>").attr({ "value": value.IdPiso }).text(value.Descripcion).appendTo("#cbopiso");
+                    });
+                    $("#cbopiso").val($("#cbopiso option:first").val());
+                    $("#cbopiso").trigger("change");
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+
+
+        });
+
+        $("#cbopiso").on("change", function (e) {
+
+            jQuery.ajax({
+                url: '@Url.Action("ListarHabitacion", "Gestion")' + '?idpiso=' + $("#cbopiso option:selected").val() ,
+                type: "GET",
+                data: null,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+
+                    $("#habitaciones").html("");
+                    $.each(data.data, function (index, value) {
+                        if (value.oEstadoHabitacion.IdEstadoHabitacion == 2) {
+                            var clase = "";
+                            var icono = "";
+                            switch (value.oEstadoHabitacion.IdEstadoHabitacion) {
+                                case 1:
+                                    clase = "success";
+                                    icono = "fas fa-box";
+                                    break;
+                                case 2:
+                                    clase = "warning";
+                                    icono = "fas fa-bed";
+                                    break;
+                                default:
+                                    clase = "info";
+                                    icono = "fas fa-air-freshener";
+                            }
+
+                            $("<div>").addClass("col-xl-3 col-md-6 mb-4").append(
+                                $("<div>").addClass("card border-" + clase + " rounded-0").append(
+                                    $("<div>").addClass("card-body").append(
+                                        $("<div>").addClass("row no-gutters align-items-center").append(
+                                            $("<div>").addClass("col mr-2").append(
+                                                $("<div>").addClass("h5 mb-0 font-weight-bold text-gray-800").text("NRO: " + value.Numero),
+                                                $("<div>").addClass("text-xs font-weight-bold text-" + clase + " text-uppercase mb-1 mt-1").text("Categoria: " + value.oCategoria.Descripcion),
+                                            ),
+                                            $("<div>").addClass("col-auto").append(
+                                                $("<i>").addClass(icono + " fa-2x text-" + clase)
+                                            )
+                                        )
+                                    ),
+                                    $("<div>").addClass("card-footer d-flex bg-" + clase + " align-items-center justify-content-between rounded-0").append(
+                                        $("<a>").addClass("small text-white stretched-link text-uppercase font-weight-bold select-habitacion").text("Iniciar Venta").data("info", JSON.stringify({ idhabitacion: value.IdHabitacion, idestadohabitacion: value.oEstadoHabitacion.IdEstadoHabitacion })),
+                                        $("<div>").addClass("small text-white").append($("<i>").addClass("fas fa-angle-right"))
+                                    )
+                                )
+                            ).appendTo("#habitaciones");
+                        }
+
+
+
+
+                    });
+
+
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+
+        })
+
+
+        $(document).on('click', '.select-habitacion', function (event) {
+            var json = JSON.parse( $(this).data("info"))
+            window.location.href = "@Url.Action("Venta", "Gestion")" + "?idhabitacion=" + json.idhabitacion;
+        });
+
+
+
+
+    </script>
+
+}

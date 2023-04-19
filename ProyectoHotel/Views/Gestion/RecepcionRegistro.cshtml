@@ -1,0 +1,278 @@
+﻿@model ProyectoHotel.Models.Habitacion
+@{
+    ViewBag.Title = "RecepcionRegistro";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card border-primary">
+    <div class="card-body">
+        <input type="hidden" value="@Html.DisplayTextFor(model => model.IdHabitacion)" id="txtidhabitacion" />
+        <h5 class="card-title font-weight-bold text-primary">Detalles de la Habitación</h5>
+        <div class="row">
+            <div class="col-6">
+                <div class="row">
+                    <label for="staticEmail" class="col-4 col-form-label font-weight-bold">Número:</label>
+                    <div class="col-sm-8">
+                        <label class="col-form-label">@Html.DisplayTextFor(model => model.Numero)</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="staticEmail" class="col-4 col-form-label font-weight-bold">Detalles:</label>
+                    <div class="col-sm-8">
+                        <label class="col-form-label">@Html.DisplayTextFor(model => model.Detalle)</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="row">
+                    <label for="staticEmail" class="col-4 col-form-label font-weight-bold">Categoria:</label>
+                    <div class="col-sm-8">
+                        <label class="col-form-label">@Html.DisplayTextFor(model => model.oCategoria.Descripcion)</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="staticEmail" class="col-4 col-form-label font-weight-bold">Piso:</label>
+                    <div class="col-sm-8">
+                        <label class="col-form-label">@Html.DisplayTextFor(model => model.oPiso.Descripcion)</label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="card mt-2 border-primary">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-6">
+
+                <h5 class="card-title font-weight-bold text-primary">Detalle Cliente</h5>
+                <input type="hidden" id="txtidcliente" value="0" />
+                <div class="form-group mb-2">
+                    <label for="exampleFormControlInput1">Nro Documento:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="txtdocumento">
+                        <div class="input-group-append">
+                            <button class="btn btn-success" id="btnbuscar" type="button">Buscar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="exampleFormControlSelect1">Tipo Documento:</label>
+                    <select class="form-control" id="cbotipodocumento">
+                        <option value="DNI">DNI</option>
+                        <option value="PASAPORTE">PASAPORTE</option>
+                        <option value="CARNET EXTRANJERIA">CARNET EXTRANJERIA</option>
+                    </select>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="exampleFormControlInput1">Nombres:</label>
+                    <input type="text" class="form-control" id="txtnombres">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="exampleFormControlInput1">Apellidos:</label>
+                    <input type="text" class="form-control" id="txtapellidos">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="exampleFormControlInput1">Correo:</label>
+                    <input type="email" class="form-control" id="txtcorreo">
+                </div>
+            </div>
+            <div class="col-6">
+                <h5 class="card-title font-weight-bold text-primary">Detalle Reservación</h5>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-2">
+                        <label for="inputEmail4">Fecha Entrada:</label>
+                        <input type="text" class="form-control" id="txtfechaentrada" disabled="disabled">
+                    </div>
+                    <div class="form-group col-md-6 mb-2">
+                        <label for="inputPassword4">Fecha Salida:</label>
+                        <input type="text" class="form-control" id="txtfechasalida">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-2">
+                        <label for="inputEmail4">Precio:</label>
+                        <input type="text" class="form-control" id="txtprecio" disabled="disabled" value="@Html.DisplayTextFor(model => model.Precio)">
+                        <input type="hidden" class="form-control" id="txtpreciobase" disabled="disabled" value="@Html.DisplayTextFor(model => model.Precio)">
+                    </div>
+                    <div class="form-group col-md-6 mb-2">
+                        <label for="inputPassword4">Adelanto:</label>
+                        <input type="text" class="form-control" id="txtadelanto" value="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlTextarea1">Observación:</label>
+                    <textarea class="form-control" id="txtobservacion" rows="3"></textarea>
+                </div>
+                <div class="form-row justify-content-end">
+
+                    <button type="button" class="btn btn-primary w-25" id="btnregistrar">Registrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="clientemodal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Lista de Clientes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="tablalector" style="width:100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Documento</th>
+                                        <th>Nombre</th>
+                                        <th>Apellido</th>
+                                        <th>Correo</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts{
+
+    <script>
+        var tabla
+        $(document).ready(function () {
+
+
+            tabla = $('#tablalector').DataTable({
+                responsive:true,
+                "ajax": {
+                    "url": '@Url.Action("ListarPersona", "Inicio")',
+                    "type": "GET",
+                    "datatype": "json",
+                    "dataSrc": function (json) {
+
+                        return json.data.filter(function (item) {
+                            return item.oTipoPersona.IdTipoPersona == 3;
+                        });
+                    }
+                },
+               "columns": [
+                    {
+                        "data": "IdPersona", "render": function (data, type, row, meta) {
+                            return $("<button>").addClass("btn btn-primary btn-select-cliente btn-sm").append(
+                                $("<i>").addClass("fas fa-check")
+                            ).attr({ "data-informacion": JSON.stringify(row) })[0].outerHTML
+                    
+                        },
+                        "orderable": false,
+                        "searchable": false,
+                        "width": "90px"
+                    },
+                    { "data": "Documento" },
+                    { "data": "Nombre" },
+                    { "data": "Apellido" },
+                    { "data": "Correo" }
+                ],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+                }
+           });
+
+            $("#txtfechaentrada").datepicker().datepicker('setDate', new Date());
+            $("#txtfechasalida").datepicker({
+                'minDate': new Date(),
+                onSelect: function (dateText, inst) {
+
+                    var dateParts1 = dateText.split("/");
+                    // meses empieza desde 0, por eso restamos dataParts[1] - 1
+                    var fechafin = new Date(dateParts1[2], dateParts1[1] - 1, dateParts1[0]); 
+
+                    var dateParts2 = $("#txtfechaentrada").val().split("/");
+                    // meses empieza desde 0, por eso restamos dataParts[1] - 1
+                    var fechaInicio = new Date(dateParts2[2], dateParts2[1] - 1, dateParts2[0]); 
+
+                    var diaEnMils = 1000 * 60 * 60 * 24;
+                    var dias = (fechafin.getTime() - fechaInicio.getTime()) / diaEnMils;
+
+                    var preciofinal = parseFloat($("#txtpreciobase").val()) * (dias +1)
+                    
+                    $("#txtprecio").val(preciofinal);
+                }
+            }).datepicker('setDate', new Date());
+            
+        });
+
+        $("#btnbuscar").on("click", function () {
+            tabla.ajax.reload();
+            $("#clientemodal").modal("show")
+        })
+
+        $(document).on('click', '.btn-select-cliente', function (event) {
+            var json = $(this).data("informacion")
+            $("#txtidcliente").val(json.IdPersona)
+            $("#txtdocumento").val(json.Documento)
+            $("#cbotipodocumento").val(json.TipoDocumento)
+            $("#txtnombres").val(json.Nombre)
+            $("#txtapellidos").val(json.Apellido)
+            $("#txtcorreo").val(json.Correo)
+            $("#clientemodal").modal("hide")
+        });
+
+        $("#btnregistrar").on("click", function () {
+            
+            var request = {
+                objeto: {
+                    oCliente: {
+                        IdPersona: $("#txtidcliente").val(), TipoDocumento: $("#cbotipodocumento").val(), Documento: $("#txtdocumento").val(),
+                        Nombre: $("#txtnombres").val(), Apellido: $("#txtapellidos").val(), Correo: $("#txtcorreo").val()
+                    },
+                    oHabitacion: { IdHabitacion: $("#txtidhabitacion").val() },
+                    FechaSalidaTexto: $("#txtfechasalida").val(),
+                    PrecioIncialTexto: $("#txtprecio").val(),
+                    AdelantoTexto: $("#txtadelanto").val(),
+                    PrecioRestanteTexto: parseFloat($("#txtprecio").val()) - ($("#txtadelanto").val() == "" ? 0 : parseFloat($("#txtadelanto").val())),
+                    Observacion: $("#txtobservacion").val()
+                }
+            }
+
+            jQuery.ajax({
+                url: '@Url.Action("RegistrarRecepcion", "Gestion")',
+                type: "POST",
+                data: JSON.stringify(request),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+
+                    if (data.resultado) {
+                        swal("Listo", "El registro fue correcto", "success").then((value) => {
+                                 window.location.href = "@Url.Action("Recepcion", "Gestion")"
+                            });
+                    } else {
+                        swal("Lo sentimos", "No se  pudo completar el registro", "warning");
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+        })
+
+    </script>
+
+}
+

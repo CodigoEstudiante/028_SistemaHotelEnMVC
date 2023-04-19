@@ -1,0 +1,144 @@
+﻿@model ProyectoHotel.Models.Recepcion
+
+@{
+    ViewBag.Title = "DetalleRecepcion";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-body p-3">
+        <h6 class="card-title font-weight-bold text-primary">Resumen de la Habitación</h6>
+        <hr class="mt-1 mb-1" />
+        <div class="form-row">
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Número:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oHabitacion.Numero)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Detalles:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oHabitacion.Detalle)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Categoria:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oHabitacion.oCategoria.Descripcion)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Piso:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oHabitacion.oPiso.Descripcion)</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Cliente:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.oCliente.Nombre) @Html.DisplayTextFor(model => model.oCliente.Apellido)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Nro. Documento:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.oCliente.Documento)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Correo:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.oCliente.Correo)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Fecha Entrada:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.FechaEntradaTexto)</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mt-2">
+    <div class="card-body p-3">
+        <h6 class="card-title font-weight-bold text-primary">Detalle de Hospedaje</h6>
+        <hr class="mt-1 mb-1" />
+        <div class="form-row">
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold">Costo Habitacion:</label>
+                <input type="number" class="form-control form-control-sm" id="validationCustom01" value="@Html.DisplayTextFor(model => model.PrecioInicial)" disabled="disabled">
+
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold">Cantidad Adelantado:</label>
+                <input type="number" class="form-control form-control-sm" id="validationCustom01" value="@Html.DisplayTextFor(model => model.Adelanto)" disabled="disabled">
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold">Cantidad Restante:</label>
+                <input type="number" class="form-control form-control-sm" id="validationCustom01" value="@Html.DisplayTextFor(model => model.PrecioRestante)" disabled="disabled">
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold">Fecha Salida:</label>
+                <input type="text" class="form-control form-control-sm" id="validationCustom01" value="@Html.DisplayTextFor(model => model.FechaSalidaTexto)" disabled="disabled">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mt-2">
+    <div class="card-body p-3">
+        <h6 class="card-title font-weight-bold text-primary">Servicio a la Habitación</h6>
+        <hr class="mt-1 mb-2" />
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-bordered table-sm">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Estado Venta</th>
+                            <th>Sub Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            if (Model.oVenta != null)
+                            {
+
+                                foreach (var venta in Model.oVenta)
+                                {
+                                    foreach (var detalleventa in venta.oDetalleVenta)
+                                    {
+                                        <tr>
+                                            <td>@detalleventa.oProducto.Nombre</td>
+                                            <td>@detalleventa.Cantidad</td>
+                                            <td>@detalleventa.oProducto.Precio</td>
+                                            <td>
+                                                @{
+                                                    if (venta.Estado == "Cancelado")
+                                                    {
+                                                        <span class="badge badge-success p-2">@venta.Estado</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-danger p-2">@venta.Estado</span>
+                                                    }
+                                                }
+
+                                            </td>
+                                            <td>@detalleventa.SubTotal</td>
+                                        </tr>
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="alert alert-secondary border-0" role="alert">
+                                            No se encontraron registros
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            }
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

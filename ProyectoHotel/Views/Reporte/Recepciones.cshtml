@@ -1,0 +1,67 @@
+﻿
+@{
+    ViewBag.Title = "Recepciones";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="card shadow-sm mt-2">
+    <div class="card-body p-3">
+        <h6 class="card-title font-weight-bold text-primary">Exportar Recepciones</h6>
+        <hr class="mt-1 mb-1" />
+        @using (Html.BeginForm("ExportarRecepciones", "Reporte", FormMethod.Post))
+        {
+            <div class="form-row align-items-end">
+                <div class="col-md-3">
+                    <label class="form-text font-weight-bold">Número Habitación:</label>
+                    <select id="cbohabitacion" name="idhabitacion" class="form-control">
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-text font-weight-bold">Fecha Inicio:</label>
+                    <input name="fechainicio" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-text font-weight-bold">Fecha Fin:</label>
+                    <input name="fechafin" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-block btn-success"><i class="fas fa-cloud-download-alt"></i> Descargar</button>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+
+@section scripts{
+    <script>
+
+        $(document).ready(function () {
+
+            jQuery.ajax({
+                url: '@Url.Action("ListarHabitacion", "Gestion")' + '?idpiso=0',
+                type: "GET",
+                data: null,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("<option>").attr({ "value": "0" }).text("Todos").appendTo("#cbohabitacion");
+
+                    $.each(data.data, function (index, value) {
+                        $("<option>").attr({ "value": value.IdHabitacion }).text(value.Numero).appendTo("#cbohabitacion");
+                    });
+                    $("#cbohabitacion").val($("#cbohabitacion option:first").val());
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+
+            $("input[name=fechainicio]").datepicker().datepicker('setDate', new Date());
+            $("input[name=fechafin]").datepicker().datepicker('setDate', new Date());
+        })
+
+    </script>
+}

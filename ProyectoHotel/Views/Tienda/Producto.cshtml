@@ -1,0 +1,276 @@
+﻿
+@{
+    ViewBag.Title = "Producto";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3 bg-primary">
+        <h6 class="m-0 font-weight-bold text-white">Lista de Productos</h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <button class="btn btn-success btn-sm" type="button" onclick="abrirModal(null)">Crear Nuevo</button>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="tabla" style="width:100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Detalle</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Detalle</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="FormModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="exampleModalLabel">Producto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input id="txtid" type="hidden" value="0" />
+                <form id="formNivel">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="txtnombre">Nombre:</label>
+                                <input type="text" class="form-control required" id="txtnombre" name="descripcion" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="txtdetalle">Detalle:</label>
+                                <input type="text" class="form-control required" id="txtdetalle" name="descripcion" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="txtprecio">Precio:</label>
+                                <input type="text" class="form-control required" id="txtprecio" name="descripcion" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="txtcantidad">Cantidad:</label>
+                                <input type="text" class="form-control required" id="txtcantidad" name="descripcion" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="cboEstado">Estado:</label>
+                                <select id="cboEstado" class="form-control">
+                                    <option value="1">Activo</option>
+                                    <option value="0">No Activo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts{
+
+    <script>
+        var tabladata;
+
+        $(document).ready(function () {
+
+
+                tabladata = $('#tabla').DataTable({
+                    responsive:true,
+                    "ajax": {
+                        "url": '@Url.Action("ListarProducto", "Tienda")',
+                        "type": "GET",
+                        "datatype": "json"
+                    },
+                    "columns": [
+                        { "data": "Nombre" },
+                        { "data": "Detalle" },
+                        { "data": "Precio" },
+                        { "data": "Cantidad" },
+                        {
+                            "data": "Estado", "render": function (data) {
+                                if (data) {
+                                    return '<span class="badge badge-success p-2">Activo</span>'
+                                } else {
+                                    return '<span class="badge badge-danger p-2">No Activo</span>'
+                                }
+                            }
+                        },
+                        {
+                            "data": "IdProducto", "render": function (data, type, row, meta) {
+
+                                return $("<button>").addClass("btn btn-primary btn-editar btn-sm").append(
+                                    $("<i>").addClass("fas fa-pen")
+                                ).attr({ "data-informacion": JSON.stringify(row) })[0].outerHTML
+                                +
+                                $("<button>").addClass("btn btn-danger btn-eliminar btn-sm ml-2").append(
+                                    $("<i>").addClass("fas fa-trash")
+                                ).attr({ "data-informacion": JSON.stringify(row) })[0].outerHTML;
+
+                            },
+                            "orderable": false,
+                            "searchable": false,
+                            "width": "90px"
+                        }
+
+                    ],
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+                    }
+                });
+        });
+
+
+
+        $(document).on('click', '.btn-editar', function (event) {
+            var json = $(this).data("informacion")
+
+            abrirModal(json)
+        });
+
+        function abrirModal(json) {
+            $("#txtid").val(0);
+            $("#txtnombre").val("");
+            $("#txtdetalle").val("");
+            $("#txtprecio").val("");
+            $("#txtcantidad").val("");
+            $("#cboEstado").val(1);
+
+            if (json != null) {
+
+                $("#txtid").val(json.IdProducto);
+                $("#txtnombre").val(json.Nombre);
+                $("#txtdetalle").val(json.Detalle);
+                $("#txtprecio").val(json.Precio);
+                $("#txtcantidad").val(json.Cantidad);
+                $("#cboEstado").val(json.Estado == true ? 1 : 0);
+            }
+
+            $('#FormModal').modal('show');
+        }
+
+        $(document).on('click', '.btn-eliminar', function (event) {
+            var json = $(this).data("informacion")
+
+            jQuery.ajax({
+                url: '@Url.Action("EliminarProducto", "Tienda")',
+                type: "POST",
+                data: JSON.stringify({ id: json.IdProducto}),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+
+                    if (data.resultado) {
+                        tabladata.ajax.reload();
+                    } else {
+                        alert("No se pudo eliminar")
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+                beforeSend: function () {
+
+                },
+            });
+        });
+
+        function Guardar() {
+            var request = {
+                objeto: {
+                    IdProducto: $("#txtid").val(),
+                    Nombre: $("#txtnombre").val(),
+                    Detalle: $("#txtdetalle").val(),
+                    PrecioTexto: $("#txtprecio").val(),
+                    Cantidad: $("#txtcantidad").val(),
+                    Estado: parseInt($("#cboEstado").val()) == 1 ? true : false
+                }
+            }
+
+            jQuery.ajax({
+                url: '@Url.Action("GuardarProducto", "Tienda")',
+                type: "POST",
+                data: JSON.stringify(request),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+
+                    if (data.resultado) {
+                        tabladata.ajax.reload();
+                        $('#FormModal').modal('hide');
+                    } else {
+                        alert("No se pudo guardar los cambios")
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+                beforeSend: function () {
+
+                },
+            });
+
+        }
+
+    </script>
+
+}
+
+

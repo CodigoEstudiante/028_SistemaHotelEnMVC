@@ -1,0 +1,260 @@
+﻿@model ProyectoHotel.Models.Recepcion
+
+@{
+    ViewBag.Title = "Venta";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<input type="hidden" value="@Html.DisplayTextFor(model => model.IdRecepcion)" id="txtidrecepcion" />
+<div class="card shadow-sm">
+    <div class="card-body  p-3">
+        <input type="hidden" value="@Html.DisplayTextFor(model => model.oHabitacion.IdHabitacion)" id="txtidhabitacion" />
+        <h6 class="card-title font-weight-bold text-primary">Resumen de la Habitación</h6>
+
+        <div class="form-row">
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Número:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oHabitacion.Numero)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Detalles:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oHabitacion.Detalle)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Categoria:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oHabitacion.oCategoria.Descripcion)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Piso:</label>
+                <label class="form-text">@Html.DisplayTextFor(model => model.oHabitacion.oPiso.Descripcion)</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Cliente:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.oCliente.Nombre) @Html.DisplayTextFor(model => model.oCliente.Apellido)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Nro. Documento:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.oCliente.Documento)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Correo:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.oCliente.Correo)</label>
+            </div>
+            <div class="col-md-3">
+                <label class="form-text font-weight-bold mb-0">Fecha Entrada:</label>
+                <label class="form-text mb-0">@Html.DisplayTextFor(model => model.FechaEntradaTexto)</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3 shadow-sm">
+    <div class="card-header card-title font-weight-bold text-primary">
+        Detalle venta
+    </div>
+    <div class="card-body p-3">
+        <div class="form-row align-items-end">
+            <div class="col-md-3">
+                <label for="validationCustom01">Producto:</label>
+                <select id="cboproducto" class="form-control"></select>
+            </div>
+            <div class="col-md-2">
+                <label for="validationCustom01">Precio:</label>
+                <input type="text" class="form-control" id="txtprecio" disabled="disabled">
+            </div>
+            <div class="col-md-2">
+                <label for="validationCustom01">Cantidad</label>
+                <input type="number" class="form-control" id="txtcantidad" value="1" min="1" max="10">
+            </div>
+            <div class="col-md-2">
+                <button id="btnagregarproducto" class="btn btn-success btn-block" type="button">Agregar</button>
+            </div>
+        </div>
+        <hr />
+
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-bordered table-sm" id="tbventa">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th></th>
+                            <th scope="col">Producto</th>
+                            <th scope="col">Cantidad</th>
+                            <th scope="col">Precio Unitario</th>
+                            <th scope="col">Sub Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+        <div class="row justify-content-end">
+            <div class="col-3 align-self-end">
+                <table class="table table-sm border-dark border-right border-top border-bottom">
+                    <tr>
+                        <td class="bg-dark text-white">Total Pagar</td>
+                        <td><label id="lbltotalpagar" class="m-0">0</label></td>
+                    </tr>
+                </table>
+            </div>
+            
+        </div>
+        <hr />
+        <div class="row justify-content-end">
+            <div class="col-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="inputGroupSelect01">Estado Venta</label>
+                    </div>
+                    <select class="custom-select" id="cboestadoventa">
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Cancelado">Cancelado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-2">
+                <button id="btnfinalizarventa" class="btn btn-primary btn-block" type="button">Finalizar Venta</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+
+    <script>
+        var tabladata;
+
+        $(document).ready(function () {
+
+            jQuery.ajax({
+                url: '@Url.Action("ListarProducto", "Tienda")',
+                type: "GET",
+                data: null,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $.each(data.data, function (index, value) {
+                        $("<option>").attr({ "value": value.IdProducto }).data("precio",value.Precio).text(value.Nombre).appendTo("#cboproducto");
+                    });
+                    $("#cboproducto").val($("#cboproducto option:first").val());
+                    $("#cboproducto").trigger("change");
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+
+
+        });
+
+
+        $("#cboproducto").on("change", function (e) {
+            var precio = $("#cboproducto option:selected").data("precio");
+            $("#txtprecio").val(parseFloat(precio).toFixed(2));
+            $("#txtcantidad").val(1);
+        })
+
+        $("#btnagregarproducto").on("click", function (e) {
+
+            var existe_producto = false;
+
+            $('#tbventa > tbody  > tr').each(function (e) {
+                if ($("#cboproducto option:selected").val() == $(this).data("idproducto")) {
+                    existe_producto = true;
+                    return false;
+                }
+            });
+
+            if (!existe_producto) {
+                $("#tbventa").append(
+                    $("<tr>").append(
+                        $("<td>").append(
+                            $("<button>").addClass("btn btn-outline-danger btn-sm eliminar-producto").attr({ "type": "button" }).append($("<i>").addClass("fas fa-trash"))
+                        ).attr({ "align": "center" }),
+                        $("<td>").text($("#cboproducto option:selected").text()),
+                        $("<td>").text($("#txtcantidad").val()),
+                        $("<td>").text(parseFloat($("#txtprecio").val()).toFixed(2)),
+                        $("<td>").text(parseFloat(parseFloat($("#txtcantidad").val()) * parseFloat($("#txtprecio").val())).toFixed(2)),
+                    ).data("idproducto", $("#cboproducto option:selected").val())
+                )
+                calcularTotalPagar();
+            }
+        })
+
+        $(document).on("click",".eliminar-producto", function (e) {
+            $(this).parents("tr").remove();
+            calcularTotalPagar()
+        })
+        
+        function calcularTotalPagar() {
+            var total = 0;
+            $('#tbventa > tbody  > tr').each(function (e) {
+                total += parseFloat($(this).find("td:eq(4)").text());
+            });
+            $("#lbltotalpagar").text(parseFloat(total).toFixed(2));
+        }
+
+
+
+        $("#btnfinalizarventa").on("click", function (e) {
+
+            var detalleventa = [];
+            $('#tbventa > tbody  > tr').each(function (e) {
+                detalleventa.push(
+                    {
+                        oProducto: { IdProducto: $(this).data("idproducto") },
+                        Cantidad : parseInt($(this).find("td:eq(2)").text()),
+                        SubTotal : parseFloat($(this).find("td:eq(4)").text())
+                    }
+                )
+            });
+
+
+            var request = {
+                objeto: {
+                    oRecepcion: { IdRecepcion: $("#txtidrecepcion").val() },
+                    Total: parseFloat($("#lbltotalpagar").text()),
+                    Estado: $("#cboestadoventa option:selected").val(),
+                    oDetalleVenta: detalleventa
+                }
+            }
+
+            
+            jQuery.ajax({
+                url: '@Url.Action("RegistrarVenta", "Tienda")',
+                type: "POST",
+                data: JSON.stringify(request),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+
+                    if (data.resultado) {
+                        $("#tbventa tbody tr").remove();
+                        $("#lbltotalpagar").text("0");
+                        $("#cboestadoventa").val($("#cboestadoventa option:first").val());
+                        $("#cboproducto").val($("#cboproducto option:first").val());
+                        $("#cboproducto").trigger("change");
+                        swal("Listo", "La venta fue registrada", "success");
+                    } else {
+                        swal("Lo sentimos", "No se pudo completar la venta", "warning");
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+                beforeSend: function () {
+
+                },
+            });
+
+        })
+        
+
+    </script>
+
+}
